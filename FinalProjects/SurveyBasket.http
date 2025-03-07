@@ -1,0 +1,6 @@
+@SurveyBasket_HostAddress = http://localhost:5135
+
+GET {{SurveyBasket_HostAddress}}/Polls/
+Accept: application/json
+
+###
