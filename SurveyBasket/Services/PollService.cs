@@ -2,7 +2,7 @@
 
 public class PollService : IPollService
 {
-    private readonly List<Poll> _polls = [
+    private readonly  static List<Poll> _polls = [
         new Poll {
             Id = 1,
             Title = "First Poll",
