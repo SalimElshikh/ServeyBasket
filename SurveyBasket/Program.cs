@@ -1,12 +1,11 @@
-using SurveyBasket;
-
-
-
+using Microsoft.AspNetCore.Routing;
 
 var builder = WebApplication.CreateBuilder(args);
-
 // Add services to the container.
-builder.Services.AddDependencies();
+var configuration = builder.Configuration;
+
+builder.Services.AddDependencies(builder.Configuration);
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -18,8 +17,10 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseAuthorization();
+app.UseCors(); 
 
+app.UseAuthorization();
 app.MapControllers();
+app.UseExceptionHandler();
 
 app.Run();

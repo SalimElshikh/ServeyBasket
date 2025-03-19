@@ -1,5 +1,9 @@
-﻿global using Microsoft.AspNetCore.Mvc;
-global using SurveyBasket.Models;
+﻿global using System;
+global using SurveyBasket.Abstractions;
+
+global using SurveyBasket;
+global using Microsoft.AspNetCore.Mvc;
+global using SurveyBasket.Entities;
 global using SurveyBasket.Reposatories;
 global using SurveyBasket.Services;
 global using SurveyBasket.Contracts;
@@ -10,7 +14,15 @@ global using System.Reflection;
 global using System.ComponentModel.DataAnnotations;
 global using FluentValidation;
 global using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
-global using SurveyBasket.Contracts.Request;
+global using Microsoft.EntityFrameworkCore;
+global using Microsoft.EntityFrameworkCore.Metadata.Builders;
+global using SurveyBasket.Persistence;
+global using Microsoft.AspNetCore.Identity;
+global using SurveyBasket.Contracts.Authentication;
+
+
+
+
 
 
 
