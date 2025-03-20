@@ -10,7 +10,7 @@ public sealed class Vote
     public int PollId { get; set; }
     public string UserId { get; set; } = string.Empty;
 
-    public DateTime  SubmittedOn { get; set; } = DateTime.UtcNow;
+    public DateTime SubmittedOn { get; set; } = DateTime.UtcNow;
 
 
     public ApplicationUser User { get; set; } = default!;

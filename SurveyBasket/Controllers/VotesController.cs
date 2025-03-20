@@ -7,10 +7,11 @@ namespace SurveyBasket.Controllers;
 [Route("api/polls/{pollId}/[controller]")]
 [ApiController]
 [Authorize]
-public class VotesController(IQuestionService questionService,IVoteService voteService) : ControllerBase
+public class VotesController(IQuestionService questionService, IVoteService voteService, IResultService resultService) : ControllerBase
 {
     private readonly IQuestionService _questionService = questionService;
     private readonly IVoteService _voteService = voteService;
+    private readonly IResultService _resultService = resultService;
 
     [HttpGet("")]
     public async Task<IActionResult> Start([FromRoute] int pollId , CancellationToken cancellationToken)
@@ -29,5 +30,5 @@ public class VotesController(IQuestionService questionService,IVoteService voteS
 
         return result.IsSuccess ? Created() : result.ToProblem();
     }
-
+    
 }

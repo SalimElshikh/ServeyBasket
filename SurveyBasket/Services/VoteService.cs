@@ -42,4 +42,5 @@ public class VoteService(ApplicationDbContext context) : IVoteService
 
     }
 
+
 }

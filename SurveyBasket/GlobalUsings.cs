@@ -1,5 +1,7 @@
 ﻿global using System;
 global using SurveyBasket.Abstractions;
+global using SurveyBasket.Contracts.Results;
+global using Microsoft.AspNetCore.Authorization;
 
 global using SurveyBasket;
 global using Microsoft.AspNetCore.Mvc;
