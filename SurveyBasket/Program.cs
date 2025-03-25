@@ -1,3 +1,6 @@
+using Hangfire;
+using Hangfire.Dashboard;
+using HangfireBasicAuthenticationFilter;
 using Microsoft.AspNetCore.Routing;
 using Serilog;
 
@@ -21,8 +24,28 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseCors(); 
+app.UseCors();
+app.UseHangfireDashboard("/jobs", new DashboardOptions
+{
+    Authorization =
+    [
 
+        new HangfireCustomBasicAuthenticationFilter
+        {
+            User = app.Configuration.GetValue<string>("HangfireSettings:Username"),
+            Pass = app.Configuration.GetValue<string>("HangfireSettings:Password")
+        }
+    ],
+    DashboardTitle = "Survay Basket Jobs",
+    //IsReadOnlyFunc = (DashboardContext context) => true
+
+
+});
+var scopedFactory = app.Services.GetRequiredService<IServiceScopeFactory>();
+using var scope = scopedFactory.CreateScope();
+var nogificationService = scope.ServiceProvider.GetRequiredService<INotificationService>();
+
+RecurringJob.AddOrUpdate("SendNewPollsNotificationsd", () => nogificationService.SendNewPollsNotifications(null), Cron.Daily);
 app.UseAuthorization();
 app.MapControllers();
 app.UseExceptionHandler();

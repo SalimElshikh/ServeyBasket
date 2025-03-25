@@ -1,12 +1,14 @@
-﻿using SurveyBasket.Contracts.Polls;
+﻿using Hangfire;
+using SurveyBasket.Contracts.Polls;
 using SurveyBasket.Entities;
 using SurveyBasket.Errors;
 
 namespace SurveyBasket.Services;
 
-public class PollService(ApplicationDbContext context) : IPollService
+public class PollService(ApplicationDbContext context,INotificationService notificationService) : IPollService
 {
     private readonly ApplicationDbContext _context = context;
+    private readonly INotificationService _notificationService = notificationService;
 
     public async Task<Result<List<PollResponse>>> GetAllAsync(CancellationToken cancellationToken = default)
     {
@@ -96,6 +98,11 @@ public class PollService(ApplicationDbContext context) : IPollService
             return Result.Failure(PollErrors.NotFoundError);
         poll.IsPublished = !poll.IsPublished;
         await _context.SaveChangesAsync(cancellationToken);
+
+        if (poll.IsPublished && poll.StartAt == DateOnly.FromDateTime(DateTime.UtcNow))
+            BackgroundJob.Enqueue(() => _notificationService.SendNewPollsNotifications(poll.Id));
+
+
         return Result.Success();
 
     }

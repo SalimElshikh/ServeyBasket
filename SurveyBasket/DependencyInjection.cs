@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.Extensions.Options;
+﻿using Azure.Core.Pipeline;
+using Hangfire;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using SurveyBasket.Authentication;
-using System.Text;
+
 
 namespace SurveyBasket;
 
@@ -26,15 +28,17 @@ public static class DependencyInjection
         
 
         services
-            .AddMapesterServices()
+            .AddMapsterConfig()
             .AddValidatorServices()
-            .AddDependencyInsideServices()
+            .AddDependencyInsideServices(configuration)
             .AddDbContextConfig(configuration);
 
         services.AddAuthConfig(configuration);
 
         services.AddExceptionHandler<GlobalExeptionHandler>();
         services.AddProblemDetails();
+        services.AddBackGroundConfig(configuration); 
+        services.AddDistributedMemoryCache();
 
         return services;
     }
@@ -43,19 +47,16 @@ public static class DependencyInjection
 
 
 
-    private static IServiceCollection AddMapesterServices(this IServiceCollection services)
+    private static IServiceCollection AddMapsterConfig(this IServiceCollection services)
     {
+        var mappingConfig = TypeAdapterConfig.GlobalSettings;
+        mappingConfig.Scan(Assembly.GetExecutingAssembly());
 
-        //Add Mapster
-        var mapppingConfig = TypeAdapterConfig.GlobalSettings;
-        mapppingConfig.Scan(Assembly.GetExecutingAssembly());
-        services.AddSingleton<IMapper>(new Mapper(mapppingConfig));
-        
-
-        
+        services.AddSingleton<IMapper>(new Mapper(mappingConfig));
 
         return services;
     }
+
 
     private static IServiceCollection AddValidatorServices(this IServiceCollection services)
     {
@@ -69,14 +70,19 @@ public static class DependencyInjection
         return services;
     }
 
-    private static IServiceCollection AddDependencyInsideServices(this IServiceCollection services)
+    private static IServiceCollection AddDependencyInsideServices(this IServiceCollection services,IConfiguration configuration)
     {
         services.AddScoped<IPollService, PollService>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IQuestionService, QuestionService>();
         services.AddScoped<IVoteService, VoteService>();
         services.AddScoped<IResultService, ResultService>();
-
+        services.AddScoped<ICachService, CacheService>();
+        services.AddScoped<IEmailSender,EmailService>();
+        services.AddScoped<IUserService, UserService>();
+        services.AddScoped<INotificationService, NotificationService>();
+        services.Configure<MailSettings>(configuration.GetSection(nameof(MailSettings)));
+        services.AddHttpContextAccessor();
         return services;
     }
 
@@ -105,7 +111,8 @@ public static class DependencyInjection
         var settings = configuration.GetSection(JwtOptions.SectionName).Get<JwtOptions>();
 
         services.AddIdentity<ApplicationUser, IdentityRole>()
-            .AddEntityFrameworkStores<ApplicationDbContext>();
+            .AddEntityFrameworkStores<ApplicationDbContext>()
+            .AddDefaultTokenProviders();
 
         services.AddAuthentication(options =>
         {
@@ -126,7 +133,26 @@ public static class DependencyInjection
                 ValidAudience = settings?.Audience
             };
         });
+        services.Configure<IdentityOptions>(options =>
+        {
+            options.Password.RequiredLength = 8;
+            options.SignIn.RequireConfirmedEmail = true;
+            options.User.RequireUniqueEmail = true;
+        });
         return services;
     }
+    
+    // Add the processing server as IHostedService
+    
+    private static IServiceCollection AddBackGroundConfig(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddHangfireServer();
+        services.AddHangfire(config => config
+        .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+        .UseSimpleAssemblyNameTypeSerializer()
+        .UseRecommendedSerializerSettings()
+        .UseSqlServerStorage(configuration.GetConnectionString("HangfireConnection")));
 
+        return services;
+    }
 }

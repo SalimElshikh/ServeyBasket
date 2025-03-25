@@ -6,7 +6,7 @@ using System.Security.Claims;
 namespace SurveyBasket.Controllers;
 [Route("api/polls/{pollId}/[controller]")]
 [ApiController]
-[Authorize]
+//[Authorize]
 public class VotesController(IQuestionService questionService, IVoteService voteService, IResultService resultService) : ControllerBase
 {
     private readonly IQuestionService _questionService = questionService;
