@@ -1,6 +1,7 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using SurveyBasket.Contracts.Vote;
-using SurveyBasket.Extentions;
+﻿using ApplicationLayer.Contracts.Vote;
+using ApplicationLayer.Extentions;
+using ApplicationLayer.Reposatories;
+using ApplicationLayer.Abstractions;
 using System.Security.Claims;
 
 namespace SurveyBasket.Controllers;
@@ -14,10 +15,10 @@ public class VotesController(IQuestionService questionService, IVoteService vote
     private readonly IResultService _resultService = resultService;
 
     [HttpGet("")]
-    public async Task<IActionResult> Start([FromRoute] int pollId , CancellationToken cancellationToken)
+    public async Task<IActionResult> Start([FromRoute] int pollId, CancellationToken cancellationToken)
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        var result = await _questionService.GetAvailableAsync(pollId,userId!,cancellationToken);
+        var result = await _questionService.GetAvailableAsync(pollId, userId!, cancellationToken);
         return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
     }
     [HttpPost("")]
@@ -25,10 +26,10 @@ public class VotesController(IQuestionService questionService, IVoteService vote
     {
         var userId = User.GetUserId();
 
-        var result = await _voteService.AddAsync(pollId, userId!,request, cancellationToken);
+        var result = await _voteService.AddAsync(pollId, userId!, request, cancellationToken);
         //TODO : Retutn Problem 
 
         return result.IsSuccess ? Created() : result.ToProblem();
     }
-    
+
 }

@@ -1,0 +1,10 @@
+Hello,
+1 - As a simple application folders is ok
+ but when using Class Library you can control What(say services) depends(or sees) on what(Entities Or DB context) 
+ You can use any Architecture to apply this 
+ check tis link :
+ https://www.csharp.com/UploadFile/dacca2/understand-3-tier-architecture-in-C-Sharp-net/?srsltid=AfmBOooltjvtHJmTv8aJzJOcKXHtwEl7gxjGoEE-S5gEOjd58PP7PqXi
+
+ 2- in this case SurveyBasket plays as Presentation Layer/ UI Layer it gives UI or API
+
+ 3- Reposatories Try not to fall in spelling errors as possible

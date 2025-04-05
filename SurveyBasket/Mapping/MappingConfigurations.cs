@@ -1,6 +1,5 @@
-﻿using Microsoft.AspNetCore.Connections.Features;
-using Microsoft.AspNetCore.Identity.Data;
-using SurveyBasket.Contracts.Question;
+﻿using ApplicationLayer.Contracts.Question;
+using DataLayer.Entities;
 
 namespace SurveyBasket.Mapping;
 

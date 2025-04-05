@@ -1,8 +1,13 @@
-﻿using Azure.Core.Pipeline;
+﻿using ApplicationLayer.Abstractions;
+using ApplicationLayer.Authentication;
+using ApplicationLayer.Reposatories;
+using ApplicationLayer.Services;
+using ApplicationLayer.Settings;
+using DataLayer.Entities;
+using DataLayer.Persistence;
 using Hangfire;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity.UI.Services;
-using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
 
@@ -13,7 +18,7 @@ public static class DependencyInjection
     public static IServiceCollection AddDependencies(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddControllers();
-        
+
         services.AddOpenApi();
 
         services.AddCors(options =>
@@ -25,7 +30,7 @@ public static class DependencyInjection
 
             )
         );
-        
+
 
         services
             .AddMapsterConfig()
@@ -37,7 +42,7 @@ public static class DependencyInjection
 
         services.AddExceptionHandler<GlobalExeptionHandler>();
         services.AddProblemDetails();
-        services.AddBackGroundConfig(configuration); 
+        services.AddBackGroundConfig(configuration);
         services.AddDistributedMemoryCache();
 
         return services;
@@ -70,7 +75,7 @@ public static class DependencyInjection
         return services;
     }
 
-    private static IServiceCollection AddDependencyInsideServices(this IServiceCollection services,IConfiguration configuration)
+    private static IServiceCollection AddDependencyInsideServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddScoped<IPollService, PollService>();
         services.AddScoped<IAuthService, AuthService>();
@@ -78,7 +83,7 @@ public static class DependencyInjection
         services.AddScoped<IVoteService, VoteService>();
         services.AddScoped<IResultService, ResultService>();
         services.AddScoped<ICachService, CacheService>();
-        services.AddScoped<IEmailSender,EmailService>();
+        services.AddScoped<IEmailSender, EmailService>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<INotificationService, NotificationService>();
         services.Configure<MailSettings>(configuration.GetSection(nameof(MailSettings)));
@@ -86,7 +91,7 @@ public static class DependencyInjection
         return services;
     }
 
-    private static IServiceCollection AddDbContextConfig(this IServiceCollection services , IConfiguration configuration)
+    private static IServiceCollection AddDbContextConfig(this IServiceCollection services, IConfiguration configuration)
     {
         var conncetionString = configuration.GetConnectionString("DefaultConnection") ??
             throw new InvalidOperationException("Connection String 'DefaultConnection' Not found .");
@@ -141,9 +146,9 @@ public static class DependencyInjection
         });
         return services;
     }
-    
+
     // Add the processing server as IHostedService
-    
+
     private static IServiceCollection AddBackGroundConfig(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddHangfireServer();

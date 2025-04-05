@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using SurveyBasket.Extentions;
+﻿using ApplicationLayer.Extentions;
+using ApplicationLayer.Reposatories;
+using ApplicationLayer.Abstractions;
 
 namespace SurveyBasket.Controllers;
 [Route("api/polls/{pollId}/[controller]")]
@@ -11,7 +11,7 @@ public class ResultsController(IResultService resultService) : ControllerBase
     private readonly IResultService _resultService = resultService;
 
     [HttpGet("data-row")]
-    public async Task<IActionResult> GetPollVotes(int pollId , CancellationToken cancellationToken = default)
+    public async Task<IActionResult> GetPollVotes(int pollId, CancellationToken cancellationToken = default)
     {
         var result = await _resultService.GetPollVotesAsync(pollId, cancellationToken);
         return result.IsSuccess ? Ok(result.Value) : result.ToProblem();

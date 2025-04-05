@@ -1,8 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using SharpGrip.FluentValidation.AutoValidation.Mvc.Filters;
-using SurveyBasket.Contracts.Polls;
-using SurveyBasket.Errors;
-using System.Threading;
+﻿using ApplicationLayer.Reposatories;
+using ApplicationLayer.Abstractions;
+using ApplicationLayer.Contracts.Polls;
 
 namespace SurveyBasket.Controllers;
 
@@ -54,7 +52,7 @@ public class PollsController(IPollService pollService) : ControllerBase
         var result = await _pollService.AddAsync(request, cancellationToken);
 
         if (result.IsFailure)
-            return BadRequest(result.Error); 
+            return BadRequest(result.Error);
 
         return CreatedAtAction(nameof(GetById), new { id = result.Value.Id }, result.Value);
     }
@@ -81,7 +79,7 @@ public class PollsController(IPollService pollService) : ControllerBase
     {
         var result = await _pollService.TogglePublishStatusAsync(id, cancellationToken);
 
-        return result.IsSuccess ? NoContent(): result.ToProblem();
+        return result.IsSuccess ? NoContent() : result.ToProblem();
 
     }
 

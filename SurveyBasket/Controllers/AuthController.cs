@@ -1,24 +1,27 @@
-﻿using SurveyBasket.Authentication;
-using SurveyBasket.Contracts.Register;
+﻿using ApplicationLayer.Authentication;
+using ApplicationLayer.Contracts.Authentication;
+using ApplicationLayer.Contracts.Register;
+using ApplicationLayer.Reposatories;
+using ApplicationLayer.Abstractions;
 
 
 namespace SurveyBasket.Controllers;
 [ApiController]
 [Route("[controller]")]
-public class AuthController(IAuthService authService ) : ControllerBase
+public class AuthController(IAuthService authService) : ControllerBase
 {
     private readonly IAuthService _authService = authService;
-    
+
 
     [HttpPost("")]
-    public async Task<IActionResult> LoginAsync([FromBody]LoginRequest loginRequest , CancellationToken cancellationToken)
+    public async Task<IActionResult> LoginAsync([FromBody] LoginRequest loginRequest, CancellationToken cancellationToken)
     {
-        var authResult = await _authService.GetTokenAsync(loginRequest.Email, loginRequest.Password,cancellationToken);
+        var authResult = await _authService.GetTokenAsync(loginRequest.Email, loginRequest.Password, cancellationToken);
 
         return authResult.IsSuccess ? Ok(authResult.Value) : authResult.ToProblem();
-    } 
+    }
     [HttpPost("refresh")]
-    public async Task<IActionResult> RefreshAsync([FromBody]RefreshTokenRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> RefreshAsync([FromBody] RefreshTokenRequest request, CancellationToken cancellationToken)
     {
         var authResult = await _authService.GetRefreshTokenAsync(request.Token, request.RefreshToken, cancellationToken);
 
@@ -33,7 +36,7 @@ public class AuthController(IAuthService authService ) : ControllerBase
         return result.IsSuccess ? Ok() : Problem(statusCode: StatusCodes.Status400BadRequest, title: result.Error.Code, detail: result.Error.Description);
     }
     [HttpPost("register")]
-    public async Task<IActionResult> Register([FromBody] RegisterRequest request , CancellationToken cancellationToken)
+    public async Task<IActionResult> Register([FromBody] RegisterRequest request, CancellationToken cancellationToken)
     {
         var result = await _authService.RegistraterAsync(request, cancellationToken);
         return result.IsSuccess ? Ok() : result.ToProblem();
