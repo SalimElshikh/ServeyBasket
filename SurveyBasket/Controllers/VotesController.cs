@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using SurveyBasket.Abstractions.Const;
 using SurveyBasket.Contracts.Vote;
 using SurveyBasket.Extentions;
 using System.Security.Claims;
@@ -6,7 +7,7 @@ using System.Security.Claims;
 namespace SurveyBasket.Controllers;
 [Route("api/polls/{pollId}/[controller]")]
 [ApiController]
-//[Authorize]
+[Authorize(Roles = DefaultRoles.Member)]
 public class VotesController(IQuestionService questionService, IVoteService voteService, IResultService resultService) : ControllerBase
 {
     private readonly IQuestionService _questionService = questionService;
@@ -26,8 +27,6 @@ public class VotesController(IQuestionService questionService, IVoteService vote
         var userId = User.GetUserId();
 
         var result = await _voteService.AddAsync(pollId, userId!,request, cancellationToken);
-        //TODO : Retutn Problem 
-
         return result.IsSuccess ? Created() : result.ToProblem();
     }
     

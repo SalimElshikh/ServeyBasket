@@ -1,4 +1,5 @@
-﻿using SurveyBasket.Authentication;
+﻿using SurveyBasket.Abstractions.Const;
+using SurveyBasket.Authentication;
 using SurveyBasket.Contracts.Register;
 
 
@@ -9,8 +10,9 @@ public class AuthController(IAuthService authService ) : ControllerBase
 {
     private readonly IAuthService _authService = authService;
     
-
+     
     [HttpPost("")]
+    
     public async Task<IActionResult> LoginAsync([FromBody]LoginRequest loginRequest , CancellationToken cancellationToken)
     {
         var authResult = await _authService.GetTokenAsync(loginRequest.Email, loginRequest.Password,cancellationToken);
@@ -62,5 +64,12 @@ public class AuthController(IAuthService authService ) : ControllerBase
     {
         var result = await _authService.ResetPassowrdRequest(request);
         return result.IsSuccess ? NoContent() : result.ToProblem();
+    }
+
+    [HttpGet("test")]
+    public IActionResult Test()
+    {
+        var resutl = Permissions.GetAllPermissions();
+       return Ok(resutl);
     }
 }

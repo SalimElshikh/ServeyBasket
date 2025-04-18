@@ -25,6 +25,12 @@ global using SurveyBasket.Persistence;
 global using Microsoft.AspNetCore.Identity;
 global using SurveyBasket.Contracts.Authentication;
 global using SurveyBasket.Contracts.Users;
+global using Microsoft.Extensions.Options;
+global using SurveyBasket.Authentication.Filters;
+global using SurveyBasket.Abstractions.Const;
+
+global using SurveyBasket.Contracts.Roles;
+
 
 
 

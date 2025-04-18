@@ -1,9 +1,10 @@
-﻿using Azure.Core.Pipeline;
+﻿ using Azure.Core.Pipeline;
 using Hangfire;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using SurveyBasket.Authentication.Filters;
 
 
 namespace SurveyBasket;
@@ -80,6 +81,7 @@ public static class DependencyInjection
         services.AddScoped<ICachService, CacheService>();
         services.AddScoped<IEmailSender,EmailService>();
         services.AddScoped<IUserService, UserService>();
+        services.AddScoped<IRoleService, RoleService>();
         services.AddScoped<INotificationService, NotificationService>();
         services.Configure<MailSettings>(configuration.GetSection(nameof(MailSettings)));
         services.AddHttpContextAccessor();
@@ -107,10 +109,13 @@ public static class DependencyInjection
             .ValidateDataAnnotations()
             .ValidateOnStart();
 
+        services
+            .AddTransient<IAuthorizationHandler, PermissionAuthorizationHandler>()
+            .AddTransient<IAuthorizationPolicyProvider, PermissionAuthorizationPolicyProvider>();
 
         var settings = configuration.GetSection(JwtOptions.SectionName).Get<JwtOptions>();
 
-        services.AddIdentity<ApplicationUser, IdentityRole>()
+        services.AddIdentity<ApplicationUser, ApplicationRole>()
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders();
 

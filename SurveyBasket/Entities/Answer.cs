@@ -8,7 +8,7 @@ public sealed class Answer : AuditableEntity
     public bool IsActive { get; set; } = true;
 
     public int QuestionId { get; set; }
-
+    
     public Question Question { get; set; } = default !;
 
 
